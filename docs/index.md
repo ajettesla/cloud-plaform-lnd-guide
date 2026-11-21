@@ -16,79 +16,50 @@ references:
 
 # LND Cloud Platform Guide
 
-> **Professional technical documentation** for deploying and operating Lightning Network Daemon (LND) on major cloud platforms with production-grade architecture, security, and operational practices.
+> **Professional technical documentation** for deploying and operating Lightning Network Daemon (LND) on Amazon Web Services (AWS), Google Cloud Platform (GCP), and Microsoft Azure. Each guide follows a standardized format: **Abstract → Introduction → Architecture → Implementation → Operations → Validation → Cost Analysis → Security → Troubleshooting → References**, enabling consistent cross-cloud comparison and professional reference.
 
-## Abstract
+---
 
-This guide provides comprehensive, IEEE-structured documentation for running LND on Amazon Web Services (AWS), Google Cloud Platform (GCP), and Microsoft Azure. Each guide follows a standardized format: **Abstract → Introduction → Architecture → Implementation → Operations → Validation → Cost Analysis → Security → Troubleshooting → References**, enabling consistent cross-cloud comparison and professional reference.
+## Documentation Structure — Follow This Order
 
-## Scope
+### Phase 1: Cloud Fundamentals
+**[01-cloud-fundamentals/00-index.md](01-cloud-fundamentals/00-index.md)**
+1. [01-overview.md](01-cloud-fundamentals/01-overview.md) — Cloud basics, service models, global infrastructure, HA
+2. [02-prerequisites.md](01-cloud-fundamentals/02-prerequisites.md) — **Free trial details**, required knowledge, CLI setup, verification
+3. [03-service-comparison.md](01-cloud-fundamentals/03-service-comparison.md) — Service mapping across clouds
+4. [04-backbone-network.md](01-cloud-fundamentals/04-backbone-network.md) — Global fiber, latency, private connectivity
+5. [05-data-transfer-costs.md](01-cloud-fundamentals/05-data-transfer-costs.md) — Egress/ingress, bucket/log costs, LND cost model
 
-| Cloud Provider | Compute | Serverless | Kubernetes | Status |
-|----------------|---------|------------|------------|--------|
-| **AWS** | EC2, EC2 Auto Scaling | Lambda, Fargate | EKS | Yes Planned |
-| **GCP** | Compute Engine, MIG | Cloud Run, Cloud Functions | GKE | Yes Planned |
-| **Azure** | Virtual Machines, VMSS | Container Apps, Functions | AKS | Yes Planned |
+### Phase 2: Cloud Architecture (Governance, IAM, Security)
+**[02-cloud-architecture/00-index.md](02-cloud-architecture/00-index.md)**
+1. [01-resource-hierarchy.md](02-cloud-architecture/01-resource-hierarchy.md) — Governance backbone: Azure (Entra→Mgmt Groups→Subs→RGs), GCP (Workspace→Org→Folders→Projects), AWS (Mgmt Account→OUs→Accounts)
+2. [02-iam-at-levels.md](02-cloud-architecture/02-iam-at-levels.md) — **IAM at each level**: Entra ID vs Azure RBAC, Cloud Identity vs Org/Folder/Project IAM, IAM Identity Center vs Account IAM vs SCPs. Conditional Access, PIM, Entitlement Management
+3. [03-architecture-comparison.md](02-cloud-architecture/03-architecture-comparison.md) — CSPM (Defender P2 vs Security Hub vs SCC), Productivity (M365 E5 vs Workspace), Governance, Compliance (Purview vs Cloud DLP/Vault vs Macie)
+4. [04-security-networking.md](02-cloud-architecture/04-security-networking.md) — DDoS, WAF, Cloud NGFW, Bastion/IAP/Azure Bastion, VPN/SD-WAN/MPLS, PrivateLink/PSC/Private Endpoint, DNS, Load Balancing, K8s security, CSPM, vendors (Palo Alto, Fortinet, Check Point)
+5. [05-federation-patterns.md](02-cloud-architecture/05-federation-patterns.md) — Cross-cloud workforce/workload federation, Patterns A/B/C
 
-## Document Categories
+### Phase 3: Identity Fundamentals (SAML/OIDC)
+**[04-identity-fundamentals/00-index.md](04-identity-fundamentals/00-index.md)**
+1. [01-saml-oidc-fundamentals.md](04-identity-fundamentals/01-saml-oidc-fundamentals.md) — SAML 2.0/OIDC architecture, three URLs, flows, certs, tokens, mapping, trust boundaries
 
-### 00 Cloud Introduction [§00]
-Cloud fundamentals, global infrastructure, HA principles, security services, networking components.
+### Phase 4: Cloud Platform Guides (Cloud-Specific IAM)
+**[05-cloud-platform-guides/00-index.md](05-cloud-platform-guides/00-index.md)**
+1. [01-aws-iam.md](05-cloud-platform-guides/01-aws-iam.md) — IAM Core, Identity Center, SAML/OIDC, STS, IRSA, AWS as IdP
+2. [02-gcp-iam.md](05-cloud-platform-guides/02-gcp-iam.md) — Cloud Identity, WIF (workforce/workload), Service Accounts
+3. [03-azure-iam.md](05-cloud-platform-guides/03-azure-iam.md) — Entra ID vs Azure RBAC, Enterprise Apps vs App Regs, Managed Identities, Conditional Access, PIM
 
-### 01 AWS Platform [§01]
-AWS-specific IAM, tutorials, and service deep-dives.
+### Phase 5: Deployment Architecture (Patterns & Tutorials)
+**[03-deployment-architecture/00-index.md](03-deployment-architecture/00-index.md)**
+1. [01-patterns.md](03-deployment-architecture/01-patterns.md) — LND patterns: Standalone, HA, K8s, Serverless, Multi-Cloud
+2. [02-aws-tutorial.md](03-deployment-architecture/02-aws-tutorial.md) — EC2 + EBS + NLB step-by-step
+3. [03-gcp-tutorial.md](03-deployment-architecture/03-gcp-tutorial.md) — Compute Engine + PD + ILB
+4. [04-azure-tutorial.md](03-deployment-architecture/04-azure-tutorial.md) — VM + Managed Disks + LB
 
-### 02 GCP Platform [§02]
-GCP-specific IAM, tutorials, and service deep-dives.
+### Phase 6: Reference
+**[07-reference/00-index.md](07-reference/00-index.md)**
+1. [01-cli-cheatsheet.md](07-reference/01-cli-cheatsheet.md) — Unified AWS/GCP/Azure CLI
 
-### 03 Azure Platform [§03]
-Azure-specific IAM, tutorials, and service deep-dives.
-
-### 04 Cross-Cloud Comparisons [§04]
-Architecture, IAM, security, networking, and vendor comparisons across clouds.
-
-### 05 Identity Access Fundamentals [§05]
-SAML/OIDC architecture, IdP/SP patterns, federation flows.
-
-### 06 Reference [§06]
-CLI cheatsheets, limits, pricing, troubleshooting.
-
-### Reading Order
-
-| Order | Document | Purpose |
-|-------|----------|---------|
-| 1 | [§00-cloud-intro.overview] | Cloud fundamentals, global infrastructure, HA, IAM, security, networking |
-| 2 | [§00-cloud-intro.prerequisites] | Required knowledge, accounts, tools, permissions |
-| 3 | [§00-cloud-intro.cloud-comparison] | Detailed networking, egress/ingress, HA, costs |
-| 4 | [§00-cloud-intro.backbone-network] | Global network architecture, fiber, latency, private connectivity |
-| 5 | [§00-cloud-intro.data-transfer-costs] | Egress/ingress, cross-zone/region, bucket/log costs |
-| 6 | [§00-cloud-intro.ha-comparison] | HA capabilities with evidence (planned) |
-| 7 | [§00-cloud-intro.architecture-patterns] | LND deployment patterns |
-| 8 | [§05-identity-access.idp-sp-fundamentals] | SAML/OIDC architecture, flows, mapping, trust |
-| 9 | [§01-aws.iam] | AWS IAM Core, Identity Center, SAML/OIDC, STS, IRSA |
-| 10 | [§02-gcp.iam] | Cloud Identity, WIF (workforce/workload), Service Accounts |
-| 11 | [§03-azure.iam] | Entra ID, Enterprise Apps, App Regs, Managed Identities, Conditional Access |
-| 12 | [§04-cross-cloud.iam-comparison] | Side-by-side IAM comparison |
-| 13 | [§04-cross-cloud.identity-federation-patterns] | Cross-cloud workforce/workload federation |
-| 14 | [§04-cross-cloud.cloud-architecture-comparison] | Comprehensive architecture comparison |
-| 15 | [§04-cross-cloud.security-networking-comparison] | Security services, network components, DNS, LB, K8s, CSPM, vendors |
-| 16 | [§01-aws.aws-lnd-vm] | AWS EC2 + EBS + NLB tutorial |
-| 17 | [§02-gcp.gcp-lnd-vm] | GCP Compute Engine + PD + ILB tutorial |
-| 18 | [§03-azure.azure-lnd-vm] | Azure VM + Managed Disks + LB tutorial |
-| 19 | [§06-reference.cli-cheatsheet] | Unified AWS/GCP/Azure CLI reference |
-
-## Cross-Reference System
-
-This documentation uses a standardized cross-reference notation:
-
-| Notation | Meaning | Example |
-|----------|---------|---------|
-| `[§XX.Y]` | Section reference | `[§04.2]` → AWS EC2 |
-| `[Figure N]` | Diagram reference | `[Figure 3]` → Architecture diagram |
-| `[Table N]` | Table reference | `[Table 2]` → Cost comparison |
-| `[Eq. N]` | Equation reference | `[Eq. 1]` → Channel capacity |
-| `[Listing N]` | Code listing | `[Listing 4]` → Terraform module |
-| `[Algorithm N]` | Algorithm | `[Algorithm 1]` → Rebalancing logic |
+---
 
 ## Quick Start
 
@@ -96,26 +67,20 @@ This documentation uses a standardized cross-reference notation:
 # Clone and serve locally
 git clone https://github.com/ajettesla/cloud-plaform-lnd-guide
 cd cloud-plaform-lnd-guide
-pip install -r requirements.txt
-mkdocs serve
+# No Python dependencies needed — pure markdown documentation
 ```
 
-## Contributing
+## Cross-Reference System
 
-See [AGENTS.md](../AGENTS.md) for contribution guidelines, document conventions, and development workflow.
+| Notation | Meaning | Example |
+|----------|---------|---------|
+| `[§XX.Y]` | Section reference | `[§02.1]` → Resource Hierarchy |
+| `[Figure N]` | Diagram reference | `[Figure 3]` → Architecture diagram |
+| `[Table N]` | Table reference | `[Table 2]` → Cost comparison |
+| `[Listing N]` | Code listing | `[Listing 4]` → Terraform module |
+
+---
 
 ## License
 
 This documentation is licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
-
-## Citation
-
-```bibtex
-@manual{lnd-cloud-guide,
-  title        = {LND Cloud Platform Guide},
-  author       = {LND Cloud Guide Contributors},
-  year         = {2026},
-  url          = {https://ajettesla.github.io/cloud-plaform-lnd-guide},
-  note         = {Professional technical documentation for LND on AWS, GCP, Azure}
-}
-```
