@@ -1,6 +1,6 @@
 ---
 title: "Reference"
-description: "CLI cheatsheets, quick reference"
+description: "Reference — CLI cheatsheets, quick reference"
 ---
 
 # Reference — Reading Order

@@ -20,61 +20,87 @@ references:
 
 ---
 
-## Documentation Structure — Follow This Order
+## Documentation Structure — Category-First, Then Cloud
 
-### Phase 1: Cloud Fundamentals
-**[01-cloud-fundamentals/00-index.md](01-cloud-fundamentals/00-index.md)**
-1. [01-overview.md](01-cloud-fundamentals/01-overview.md) — Cloud basics, service models, global infrastructure, HA
-2. [02-prerequisites.md](01-cloud-fundamentals/02-prerequisites.md) — **Free trial details**, required knowledge, CLI setup, verification
-3. [03-service-comparison.md](01-cloud-fundamentals/03-service-comparison.md) — Service mapping across clouds
-4. [04-backbone-network.md](01-cloud-fundamentals/04-backbone-network.md) — Global fiber, latency, private connectivity
-5. [05-data-transfer-costs.md](01-cloud-fundamentals/05-data-transfer-costs.md) — Egress/ingress, bucket/log costs, LND cost model
+### 📁 01-cloud-architecture — Cloud Architecture (Per-Cloud)
+**Start here for understanding each cloud's native architecture**
+- [01-cloud-overview.md](01-cloud-architecture/01-cloud-overview.md) — Cloud basics, service models, global infrastructure, HA
+- [02-prerequisites.md](01-cloud-architecture/02-prerequisites.md) — **Free trial details** (AWS/GCP/Azure), required knowledge, CLI setup
+- [03-service-mapping.md](01-cloud-architecture/03-service-mapping.md) — Service mapping across clouds
+- [04-architecture-comparison.md](01-cloud-architecture/04-architecture-comparison.md) — CSPM, Productivity (M365 vs Workspace), Governance, Compliance
 
-### Phase 2: Cloud Architecture (Governance, IAM, Security)
-**[02-cloud-architecture/00-index.md](02-cloud-architecture/00-index.md)**
-1. [01-resource-hierarchy.md](02-cloud-architecture/01-resource-hierarchy.md) — Governance backbone: Azure (Entra→Mgmt Groups→Subs→RGs), GCP (Workspace→Org→Folders→Projects), AWS (Mgmt Account→OUs→Accounts)
-2. [02-iam-at-levels.md](02-cloud-architecture/02-iam-at-levels.md) — **IAM at each level**: Entra ID vs Azure RBAC, Cloud Identity vs Org/Folder/Project IAM, IAM Identity Center vs Account IAM vs SCPs. Conditional Access, PIM, Entitlement Management
-3. [03-architecture-comparison.md](02-cloud-architecture/03-architecture-comparison.md) — CSPM (Defender P2 vs Security Hub vs SCC), Productivity (M365 E5 vs Workspace), Governance, Compliance (Purview vs Cloud DLP/Vault vs Macie)
-4. [04-security-networking.md](02-cloud-architecture/04-security-networking.md) — DDoS, WAF, Cloud NGFW, Bastion/IAP/Azure Bastion, VPN/SD-WAN/MPLS, PrivateLink/PSC/Private Endpoint, DNS, Load Balancing, K8s security, CSPM, vendors (Palo Alto, Fortinet, Check Point)
-5. [05-federation-patterns.md](02-cloud-architecture/05-federation-patterns.md) — Cross-cloud workforce/workload federation, Patterns A/B/C
+### 📁 02-networking — Networking (Category-First)
+**All networking services, organized by function, then by cloud**
+- [00-index.md](02-networking/00-index.md) — Reading order
+- [01-backbone.md](02-networking/01-backbone.md) — Global fiber, subsea cables, network tiers, private connectivity, latency
+- [02-network-security.md](02-networking/02-network-security.md) — VPN, SD-WAN, MPLS, peering, PrivateLink/PSC/Private Endpoint
+- [03-network-components.md](02-networking/03-network-components.md) — Router, Switch, NAT, Shared VPC, Firewall, LB
+- [04-dns.md](02-networking/04-dns.md) — Route 53, Cloud DNS, Azure DNS — private zones, hybrid DNS
+- [05-load-balancing.md](02-networking/05-load-balancing.md) — L4/L7, global anycast, TLS termination, WAF integration
+- [06-vpc-peering.md](02-networking/06-vpc-peering.md) — VPC peering, PrivateLink/PSC/Private Endpoint
 
-### Phase 3: Identity Fundamentals (SAML/OIDC)
-**[04-identity-fundamentals/00-index.md](04-identity-fundamentals/00-index.md)**
-1. [01-saml-oidc-fundamentals.md](04-identity-fundamentals/01-saml-oidc-fundamentals.md) — SAML 2.0/OIDC architecture, three URLs, flows, certs, tokens, mapping, trust boundaries
+### 📁 03-iam — Identity & Access Management (Category-First)
+**IAM organized by governance level, then cloud**
+- [00-index.md](03-iam/00-index.md) — Reading order
+- [01-iam-at-levels.md](03-iam/01-iam-at-levels.md) — **IAM at each governance layer**: Entra ID vs Azure RBAC, Cloud Identity vs Org/Folder/Proj, Identity Center vs Account/SCP
+- [02-aws.md](03-iam/02-aws.md) — AWS IAM: Core, Identity Center, SAML/OIDC, STS, IRSA
+- [03-gcp.md](03-iam/03-gcp.md) — GCP IAM: Cloud Identity, WIF (workforce/workload), Service Accounts
+- [04-azure.md](03-iam/04-azure.md) — Azure IAM: Entra ID vs Azure RBAC, Enterprise Apps vs App Regs, Managed Identities, Conditional Access
 
-### Phase 4: Cloud Platform Guides (Cloud-Specific IAM)
-**[05-cloud-platform-guides/00-index.md](05-cloud-platform-guides/00-index.md)**
-1. [01-aws-iam.md](05-cloud-platform-guides/01-aws-iam.md) — IAM Core, Identity Center, SAML/OIDC, STS, IRSA, AWS as IdP
-2. [02-gcp-iam.md](05-cloud-platform-guides/02-gcp-iam.md) — Cloud Identity, WIF (workforce/workload), Service Accounts
-3. [03-azure-iam.md](05-cloud-platform-guides/03-azure-iam.md) — Entra ID vs Azure RBAC, Enterprise Apps vs App Regs, Managed Identities, Conditional Access, PIM
+### 📁 04-security — Security (Category-First)
+**Security services by function**
+- [00-index.md](04-security/00-index.md) — Reading order
+- [01-security-services.md](04-security/01-security-services.md) — DDoS, WAF, NGFW, Bastion/IAP/Azure Bastion, CSPM, vendors (Palo Alto, Fortinet, Check Point)
 
-### Phase 5: Deployment Architecture (Patterns & Tutorials)
-**[03-deployment-architecture/00-index.md](03-deployment-architecture/00-index.md)**
-1. [01-patterns.md](03-deployment-architecture/01-patterns.md) — LND patterns: Standalone, HA, K8s, Serverless, Multi-Cloud
-2. [02-aws-tutorial.md](03-deployment-architecture/02-aws-tutorial.md) — EC2 + EBS + NLB step-by-step
-3. [03-gcp-tutorial.md](03-deployment-architecture/03-gcp-tutorial.md) — Compute Engine + PD + ILB
-4. [04-azure-tutorial.md](03-deployment-architecture/04-azure-tutorial.md) — VM + Managed Disks + LB
+### 📁 05-compute — Compute (Category-First)
+- [00-index.md](05-compute/00-index.md) — VM, Kubernetes, Serverless comparison
 
-### Phase 6: Reference
-**[07-reference/00-index.md](07-reference/00-index.md)**
-1. [01-cli-cheatsheet.md](07-reference/01-cli-cheatsheet.md) — Unified AWS/GCP/Azure CLI
+### 📁 06-storage — Storage (Category-First)
+- [00-index.md](06-storage/00-index.md) — Block, Object, File, Backup/DR
+
+### 📁 07-billing — Billing & Cost Management (Category-First)
+- [00-index.md](07-billing/00-index.md) — Reading order
+- [01-data-transfer-costs.md](07-billing/01-data-transfer-costs.md) — Egress/ingress, cross-zone/region, inter-cloud, bucket/log costs
+
+### 📁 08-deployment — Deployment Architecture (Patterns & Tutorials)
+- [00-index.md](08-deployment/00-index.md) — Reading order
+- [01-patterns.md](08-deployment/01-patterns.md) — Standalone, HA, K8s, Serverless, Multi-cloud
+- [02-aws.md](08-deployment/02-aws.md) — EC2 + EBS + NLB tutorial
+- [03-gcp.md](08-deployment/03-gcp.md) — Compute Engine + PD + ILB
+- [04-azure.md](08-deployment/04-azure.md) — VM + Managed Disks + LB
+
+### 📁 09-identity-fundamentals — SAML/OIDC Fundamentals
+- [00-index.md](09-identity-fundamentals/00-index.md) — Reading order
+- [01-saml-oidc.md](09-identity-fundamentals/01-saml-oidc.md) — SAML 2.0/OIDC architecture, flows, certs, tokens, mapping, trust boundaries
+
+### 📁 10-cross-cutting — Cross-Cutting Concerns
+- [00-index.md](10-cross-cutting/00-index.md) — Reading order
+- [01-federation-patterns.md](10-cross-cutting/01-federation-patterns.md) — Cross-cloud workforce/workload federation, Patterns A/B/C
+
+### 📁 11-reference — Reference
+- [00-index.md](11-reference/00-index.md) — Reading order
+- [01-cli-cheatsheet.md](11-reference/01-cli-cheatsheet.md) — Unified AWS/GCP/Azure CLI
 
 ---
 
-## Quick Start
+## Recommended Reading Order
 
-```bash
-# Clone and serve locally
-git clone https://github.com/ajettesla/cloud-plaform-lnd-guide
-cd cloud-plaform-lnd-guide
-# No Python dependencies needed — pure markdown documentation
-```
+| Phase | Section | Start With |
+|-------|---------|------------|
+| **1. Cloud Basics** | 01-cloud-architecture | 01-cloud-overview → 02-prerequisites |
+| **2. Category Deep Dives** | 02-networking → 03-iam → 04-security → 05-compute → 06-storage → 07-billing | Each category's 00-index.md |
+| **3. Identity Fundamentals** | 09-identity-fundamentals | 01-saml-oidc.md |
+| **4. Cloud-Specific IAM** | 03-iam | 02-aws → 03-gcp → 04-azure |
+| **5. Deployment** | 08-deployment | 01-patterns → tutorials |
+| **6. Cross-Cutting** | 10-cross-cutting | 01-federation-patterns.md |
+
+---
 
 ## Cross-Reference System
 
 | Notation | Meaning | Example |
 |----------|---------|---------|
-| `[§XX.Y]` | Section reference | `[§02.1]` → Resource Hierarchy |
+| `[§XX.Y]` | Section reference | `[§02.1]` → Backbone Network |
 | `[Figure N]` | Diagram reference | `[Figure 3]` → Architecture diagram |
 | `[Table N]` | Table reference | `[Table 2]` → Cost comparison |
 | `[Listing N]` | Code listing | `[Listing 4]` → Terraform module |
