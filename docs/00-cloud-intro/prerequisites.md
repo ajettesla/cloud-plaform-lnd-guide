@@ -51,6 +51,19 @@ This guide outlines all prerequisites for following the LND Cloud Platform Guide
 - MFA enabled on root and IAM users
 - Default region configured (recommended: `us-east-1`, `us-west-2`, `eu-west-1`)
 
+### 2.1.2 Free Tier Details
+
+| Aspect | Details |
+|--------|---------|
+| **Free Tier Duration** | 12 months from account creation |
+| **Always Free** | Select services (Lambda 1M requests, DynamoDB 25 GB, S3 5 GB, etc.) |
+| **12-Month Free** | EC2 t2/t3.micro (750 hrs/mo), RDS db.t3.micro (750 hrs), S3 5 GB, CloudFront 50 GB |
+| **Payment Method** | Credit/debit card required at signup (verified, not charged unless exceeding free tier) |
+| **No Free Tier For** | EKS control plane ($0.10/hr), NAT Gateway, Transit Gateway, Global Accelerator, Shield Advanced |
+| **Account Closure** | Can close anytime; no charge if within free tier limits |
+
+Reference: [AWS Free Tier](https://aws.amazon.com/free/)
+
 ### 2.1.2 Required Permissions
 
 ```json
@@ -103,6 +116,23 @@ aws sts get-caller-identity
 - 2FA enabled
 - Default region/zone configured
 
+### 2.2.2 Free Trial Details
+
+| Aspect | Details |
+|--------|---------|
+| **Free Trial Duration** | 90 days from signup |
+| **Free Credit** | $300 USD credit (applied to billing account) |
+| **Payment Method Required** | **Yes** — Valid credit/debit card required at signup |
+| **Card Verification Hold** | **₹3,000 INR** (or equivalent USD ~$36) temporary authorization hold on debit/credit card; released after verification |
+| **Billing Account** | Must upgrade to paid billing account after trial ends or credit exhausted to continue services |
+| **Always Free Tier** | Limited services (Compute Engine e2-micro 1 instance in us regions, 5 GB Cloud Storage, 1 GB Cloud Logging, etc.) |
+| **Google Admin Console** | **NOT available** in free trial — requires paid Google Workspace/Cloud Identity subscription (~$6/user/mo for Business Starter) |
+| **Cloud Identity/Workspace** | Not included in GCP free trial; separate subscription required for identity management, SSO, device management |
+| **Services Not Covered** | Cloud Interconnect, Cloud Armor Premium, Cloud NGFW, SCC Premium, Anthos, Looker, Vertex AI (beyond free tier) |
+| **Trial Expiration** | Services stop if not upgraded; data retained 30 days then deleted |
+
+Reference: [Google Cloud Free Trial](https://cloud.google.com/free), [Google Cloud Billing](https://cloud.google.com/billing/docs)
+
 ### 2.2.2 Required Permissions
 
 Roles needed:
@@ -138,6 +168,24 @@ gcloud config get-value project
 - User with `Owner` or `Contributor` + `User Access Administrator` roles
 - MFA enabled via Entra ID
 - Default location configured
+
+### 2.3.2 Free Trial Details
+
+| Aspect | Details |
+|--------|---------|
+| **Free Trial Duration** | 30 days from signup (or 12 months for specific services) |
+| **Free Credit** | $200 USD credit for first 30 days |
+| **Payment Method Required** | **Yes** — Valid credit/debit card required for identity verification |
+| **Card Verification** | Small authorization hold (typically $1-2 USD) to verify card; released immediately |
+| **Free Tier (12 Months)** | 750 hrs B1S VM (Linux/Windows), 250 GB SQL Database, 5 GB Cosmos DB, 5 GB Blob Storage, 15 GB Bandwidth |
+| **Always Free** | Azure AD Free tier, Azure Policy, Resource Graph, Advisor, Cost Management |
+| **Entra ID (Azure AD) Free** | Included — up to 500,000 objects, SSO for 10 apps, self-service password reset (cloud users) |
+| **Entra ID P1/P2** | Not in free trial — requires paid license ($6/$9 per user/mo) |
+| **Services Not Covered** | Azure Firewall, Front Door Standard/Premium, DDoS Protection Standard, Defender for Cloud P2, Azure Virtual WAN, ExpressRoute |
+| **Trial Expiration** | Subscription disabled if not upgraded; data retained 90 days then deleted |
+| **Student/Visual Studio** | Additional free credits ($100 Azure credit for students, $50-150/mo for VS subscribers) |
+
+Reference: [Azure Free Account](https://azure.microsoft.com/free/), [Azure Free Services](https://azure.microsoft.com/pricing/free-services/)
 
 ### 2.3.2 Required Permissions
 
