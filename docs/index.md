@@ -4,6 +4,14 @@ description: "Professional technical documentation for deploying Lightning Netwo
 tags: [home, lnd, lightning-network, aws, gcp, azure]
 cloud: all
 level: 100
+version: "1.0"
+date: 2026-11-21
+authors: ["LND Cloud Guide Contributors"]
+references:
+  - "Lightning Network Daemon Documentation"
+  - "Google Cloud Workforce Identity Federation Documentation"
+  - "AWS IAM Identity Center Documentation"
+  - "Microsoft Entra ID Documentation"
 ---
 
 # LND Cloud Platform Guide

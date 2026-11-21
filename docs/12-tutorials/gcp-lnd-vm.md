@@ -14,6 +14,10 @@ prerequisites:
   - "Git installed"
   - "GCP project with Compute Engine, Cloud Storage, Cloud KMS, Cloud Monitoring APIs enabled"
   - "SSH key pair generated"
+references:
+  - "GCP LND Terraform Module"
+  - "LND Operations Guide"
+  - "Compute Engine Documentation"
 ---
 
 # Tutorial: Deploy LND on GCP Compute Engine

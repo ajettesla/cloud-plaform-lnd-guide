@@ -14,6 +14,11 @@ prerequisites:
   - "Git installed"
   - "AWS account with EC2, EBS, NLB, S3, KMS, CloudWatch permissions"
   - "SSH key pair generated"
+references:
+  - "AWS LND Terraform Module"
+  - "LND Operations Guide"
+  - "AWS EC2 User Guide"
+  - "Network Load Balancer Guide"
 ---
 
 # Tutorial: Deploy LND on AWS EC2 with EBS and Network Load Balancer

@@ -14,6 +14,10 @@ prerequisites:
   - "Git installed"
   - "Azure subscription with Compute, Storage, Key Vault, Monitor permissions"
   - "SSH key pair generated"
+references:
+  - "Azure LND Terraform Module"
+  - "LND Operations Guide"
+  - "Azure Virtual Machines Documentation"
 ---
 
 # Tutorial: Deploy LND on Azure Virtual Machines
