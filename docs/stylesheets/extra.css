@@ -1,0 +1,175 @@
+/* Custom styles for LND Cloud Platform Guide */
+
+/* IEEE-style figure captions */
+.figure-caption {
+  font-size: 0.875rem;
+  color: var(--md-default-fg-color--light);
+  text-align: center;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+/* Table captions */
+.table-caption {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--md-default-fg-color--light);
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+/* Code listing captions */
+.listing-caption {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--md-default-fg-color--light);
+  text-align: left;
+  margin-bottom: 0.5rem;
+  font-family: var(--md-code-font);
+}
+
+/* Cross-reference links */
+.cross-ref {
+  font-weight: 500;
+  text-decoration: none;
+  border-bottom: 1px dotted var(--md-primary-fg-color);
+}
+
+.cross-ref:hover {
+  border-bottom-style: solid;
+}
+
+/* Cloud provider badges */
+.cloud-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.cloud-badge-aws { background-color: #ff9900; color: #000; }
+.cloud-badge-gcp { background-color: #4285f4; color: #fff; }
+.cloud-badge-azure { background-color: #0078d4; color: #fff; }
+.cloud-badge-all { background-color: #6b7280; color: #fff; }
+
+/* Level badges */
+.level-badge {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 0.25rem;
+  background-color: var(--md-primary-fg-color);
+  color: var(--md-primary-bg-color);
+}
+
+/* Admonition icons */
+.md-typeset .admonition.note,
+.md-typeset .admonition.tip {
+  border-left-color: var(--md-info-fg-color);
+}
+
+.md-typeset .admonition.warning,
+.md-typeset .admonition.caution {
+  border-left-color: var(--md-warning-fg-color);
+}
+
+.md-typeset .admonition.danger,
+.md-typeset .admonition.error {
+  border-left-color: var(--md-danger-fg-color);
+}
+
+/* Mermaid diagram container */
+.mermaid {
+  text-align: center;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Tabbed code blocks */
+.tabbed-set {
+  margin: 1.5rem 0;
+}
+
+.tabbed-labels {
+  display: flex;
+  border-bottom: 2px solid var(--md-default-fg-color--lightest);
+  margin-bottom: 0;
+}
+
+.tabbed-label {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-weight: 500;
+  color: var(--md-default-fg-color--light);
+  transition: all 0.2s;
+}
+
+.tabbed-label:hover {
+  color: var(--md-primary-fg-color);
+}
+
+.tabbed-label[aria-selected="true"] {
+  color: var(--md-primary-fg-color);
+  border-bottom-color: var(--md-primary-fg-color);
+}
+
+/* Equation numbering */
+.mjx-chtml[equation-number] {
+  text-align: right;
+}
+
+/* Footnotes */
+.footnotes {
+  font-size: 0.875rem;
+  color: var(--md-default-fg-color--light);
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  padding-top: 1rem;
+  margin-top: 2rem;
+}
+
+.footnotes hr {
+  display: none;
+}
+
+/* Print styles */
+@media print {
+  .md-header,
+  .md-footer,
+  .md-tabs,
+  .md-search,
+  .tabbed-labels,
+  .admonition-title {
+    display: none !important;
+  }
+  
+  .md-content {
+    max-width: none;
+  }
+  
+  .mermaid {
+    page-break-inside: avoid;
+  }
+  
+  table {
+    page-break-inside: avoid;
+  }
+}
+
+/* Dark mode adjustments */
+[data-md-color-scheme="slate"] {
+  .cloud-badge-aws { background-color: #ff9900; color: #000; }
+  .cloud-badge-gcp { background-color: #8ab4f8; color: #000; }
+  .cloud-badge-azure { background-color: #60a5fa; color: #000; }
+}
