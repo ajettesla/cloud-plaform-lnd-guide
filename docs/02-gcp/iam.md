@@ -526,10 +526,10 @@ gcloud auth print-access-token --impersonate-service-account=lnd-log-writer@acme
 
 | Log Type | Description | Enabled By Default |
 |----------|-------------|-------------------|
-| **Admin Activity** | IAM policy changes, resource creation | ✅ |
-| **Data Access** | API calls that read/write data | ❌ (enable per service) |
-| **System Event** | GCP infrastructure actions | ✅ |
-| **Policy Denied** | IAM denials | ✅ |
+| **Admin Activity** | IAM policy changes, resource creation | Yes |
+| **Data Access** | API calls that read/write data | No (enable per service) |
+| **System Event** | GCP infrastructure actions | Yes |
+| **Policy Denied** | IAM denials | Yes |
 
 ## 7.2 Key Log Queries
 

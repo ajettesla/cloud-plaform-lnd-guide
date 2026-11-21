@@ -27,9 +27,9 @@ This document provides a comprehensive comparison of Amazon Web Services (AWS), 
 | **ARM/Graviton** | Graviton2/3/4 | Tau T2A, Axion | Cobalt 100 |
 | **Confidential Computing** | Nitro Enclaves | Confidential VMs | Confidential VMs |
 | **Spot/Preemptible** | Spot Instances (90% off) | Spot VMs (60-91% off) | Spot VMs (90% off) |
-| **Per-second Billing** | ✅ (Linux) | ✅ | ✅ (Linux) |
+| **Per-second Billing** | Yes (Linux) | Yes | Yes (Linux) |
 | **Local NVMe** | i3, i4, im4gn | Local SSD | Lsv3, Lsv2 |
-| **Dedicated Hosts** | ✅ | Sole-tenant nodes | Dedicated Hosts |
+| **Dedicated Hosts** | Yes | Sole-tenant nodes | Dedicated Hosts |
 
 ## 1.2 Kubernetes
 
@@ -39,7 +39,7 @@ This document provides a comprehensive comparison of Amazon Web Services (AWS), 
 | **Node Pools** | Managed/Unmanaged | Standard/Autopilot | System/User |
 | **Workload Identity** | IRSA | GKE Workload Identity | Azure AD Workload Identity |
 | **Autoscaling** | Karpenter, Cluster Autoscaler | GKE Autopilot, NAP | Cluster Autoscaler, NAP |
-| **Private Clusters** | ✅ | ✅ | ✅ |
+| **Private Clusters** | Yes | Yes | Yes |
 | **Release Channels** | Standard, Extended | Rapid, Regular, Stable | Standard, Rapid |
 
 ## 1.3 Serverless
@@ -50,8 +50,8 @@ This document provides a comprehensive comparison of Amazon Web Services (AWS), 
 | **Memory** | 10 GB | 32 GB | 18 GB |
 | **vCPU** | 6 | 8 | 4 |
 | **Cold Start** | ~100ms | ~200ms | ~500ms |
-| **VPC Support** | ✅ | ✅ | ✅ |
-| **GPU** | ❌ | ✅ (L4) | ❌ |
+| **VPC Support** | Yes | Yes | Yes |
+| **GPU** | No | Yes (L4) | No |
 | **Pricing** | Per 1ms | Per 100ms | Per second |
 
 # 2. Storage Comparison
@@ -65,7 +65,7 @@ This document provides a comprehensive comparison of Amazon Web Services (AWS), 
 | **Max IOPS** | 256,000 (io2) | 360,000 (Extreme) | 80,000 (Premium v2) |
 | **Encryption** | AWS KMS / Custom | Google KMS / CMEK | Azure Key Vault / CMK |
 | **Snapshots** | Incremental, cross-region | Incremental, multi-region | Incremental, geo-redundant |
-| **Multi-attach** | io2 only | ❌ | ❌ |
+| **Multi-attach** | io2 only | No | No |
 
 ## 2.2 Object Storage
 
@@ -96,10 +96,10 @@ This document provides a comprehensive comparison of Amazon Web Services (AWS), 
 |---------|-------------|--------------|---------------------|
 | **L4 (TCP/UDP)** | NLB | External TCP/UDP LB | Standard LB |
 | **L7 (HTTP/HTTPS)** | ALB | External HTTP(S) LB | Application Gateway |
-| **Global Anycast** | ❌ (ALB regional) | ✅ | ❌ |
-| **TLS Termination** | ✅ | ✅ | ✅ |
+| **Global Anycast** | No (ALB regional) | Yes | No |
+| **TLS Termination** | Yes | Yes | Yes |
 | **Health Checks** | TCP, HTTP, HTTPS | TCP, HTTP, HTTPS, gRPC | TCP, HTTP, HTTPS |
-| **Cross-zone LB** | ✅ (NLB) | ✅ | ✅ |
+| **Cross-zone LB** | Yes (NLB) | Yes | Yes |
 
 # 4. Security Comparison
 
@@ -110,8 +110,8 @@ This document provides a comprehensive comparison of Amazon Web Services (AWS), 
 | **Model** | Policy-based | Role-based (with conditions) | Role-based (with conditions) |
 | **Workload Identity** | IRSA (OIDC) | Workload Identity (OIDC) | Entra Workload Identity (OIDC) |
 | **Service Accounts** | IAM Roles | Service Accounts | Managed Identities |
-| **Condition Keys** | ✅ | ✅ | ✅ |
-| **Permission Boundaries** | ✅ | ✅ (deny policies) | ✅ |
+| **Condition Keys** | Yes | Yes | Yes |
+| **Permission Boundaries** | Yes | Yes (deny policies) | Yes |
 | **External Identities** | SAML/OIDC | SAML/OIDC | SAML/OIDC/WS-Fed |
 
 ## 4.2 Secrets & Keys
@@ -119,7 +119,7 @@ This document provides a comprehensive comparison of Amazon Web Services (AWS), 
 | Feature | AWS Secrets Manager + KMS | GCP Secret Manager + Cloud KMS | Azure Key Vault + Managed HSM |
 |---------|---------------------------|--------------------------------|--------------------------------|
 | **Rotation** | Native (Lambda) | Native (Cloud Functions) | Native (Rotation Policies) |
-| **Versioning** | ✅ | ✅ | ✅ |
+| **Versioning** | Yes | Yes | Yes |
 | **Cross-region** | Replication | Multi-region | Geo-replication |
 | **HSM** | CloudHSM (FIPS 140-2 L3) | Cloud HSM (FIPS 140-2 L3) | Managed HSM (FIPS 140-2 L3) |
 | **Cost** | $0.40/secret/mo + API calls | $0.06/secret/mo + API calls | Standard: free, Premium: $1/key/mo |

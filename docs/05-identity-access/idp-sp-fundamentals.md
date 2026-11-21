@@ -468,9 +468,9 @@ flowchart LR
 
 | Identifier | Stability | Use as Subject? |
 |------------|-----------|-----------------|
-| `objectId` (Entra) / `sub` (OIDC) | Immutable, globally unique | ✅ **Yes** |
-| `userPrincipalName` / `email` | Can change (marriage, rebrand) | ❌ No |
-| `displayName` | Mutable, not unique | ❌ No |
+| `objectId` (Entra) / `sub` (OIDC) | Immutable, globally unique | Yes |
+| `userPrincipalName` / `email` | Can change (marriage, rebrand) | No |
+| `displayName` | Mutable, not unique | No |
 | `employeeId` | Stable if HR system consistent | ⚠️ If guaranteed |
 
 **Table 5:** Identifier stability comparison.

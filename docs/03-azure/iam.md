@@ -78,11 +78,11 @@ graph TB
 | Aspect | **Enterprise Applications** | **App Registrations** |
 |--------|----------------------------|----------------------|
 | **Primary Use** | SAML IdP for gallery/custom apps | OIDC/OAuth IdP for custom apps |
-| **SAML Config** | ✅ Single sign-on → SAML | ❌ Not supported |
-| **OIDC Config** | ❌ Limited | ✅ Authentication → OIDC |
-| **Gallery Apps** | ✅ Pre-integrated (Salesforce, etc.) | ❌ |
-| **User Assignment** | ✅ Users and groups tab | ❌ (use Enterprise App) |
-| **Provisioning (SCIM)** | ✅ Provisioning tab | ❌ |
+| **SAML Config** | Yes Single sign-on → SAML | Not supported |
+| **OIDC Config** | No Limited | Yes Authentication → OIDC |
+| **Gallery Apps** | Yes Pre-integrated (Salesforce, etc.) | No |
+| **User Assignment** | Yes Users and groups tab | No (use Enterprise App) |
+| **Provisioning (SCIM)** | Yes Provisioning tab | No |
 | **Consent** | Admin consent for org | User/admin consent per app |
 
 **Table 1:** Enterprise Applications vs App Registrations.
@@ -129,8 +129,8 @@ graph LR
 
 | GCP Attribute | Entra Claim URI | Entra Claim Name | Stability |
 |---------------|-----------------|------------------|-----------|
-| `google.subject` | `http://schemas.microsoft.com/identity/claims/objectidentifier` | `objectidentifier` | ✅ Immutable |
-| `google.groups` | `http://schemas.microsoft.com/ws/2008/06/identity/claims/groups` | `groups` (Object IDs) | ✅ Immutable |
+| `google.subject` | `http://schemas.microsoft.com/identity/claims/objectidentifier` | `objectidentifier` | Yes Immutable |
+| `google.groups` | `http://schemas.microsoft.com/ws/2008/06/identity/claims/groups` | `groups` (Object IDs) | Yes Immutable |
 | `attribute.department` | `http://schemas.microsoft.com/identity/claims/department` | `department` | ⚠️ Mutable |
 
 **Table 3:** Required Entra SAML claims for GCP WIF.
@@ -200,7 +200,7 @@ assertion.attributes['tid'] == 'acmecorp-tenant-id'
 | Setting | Value |
 |---------|-------|
 | **Redirect URI** | `https://auth.cloud.google/oidc-callback` |
-| **Implicit grant** | ✅ ID tokens (for hybrid flow) |
+| **Implicit grant** | Yes ID tokens (for hybrid flow) |
 | **Supported account types** | Single tenant |
 | **Client secret** | Create new (store securely) |
 
