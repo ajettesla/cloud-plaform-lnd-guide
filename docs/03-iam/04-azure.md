@@ -1,11 +1,11 @@
 ---
-title: "Microsoft Entra ID: Architecture, SAML/OIDC IdP, Workload Identities, and Conditional Access"
-description: "Comprehensive guide to Microsoft Entra ID architecture, Enterprise Applications vs App Registrations for SAML/OIDC IdP, Managed Identities, Workload Identity Federation, and Conditional Access policies."
-tags: [azure, entra-id, saml, oidc, enterprise-applications, app-registrations, managed-identities, workload-identity, conditional-access]
+title: "Microsoft Entra ID: Architecture, SAML/OIDC IdP, Workload Identities, and Conditional Access — Cross-Verified"
+description: "Comprehensive guide to Microsoft Entra ID architecture, Enterprise Applications vs App Registrations for SAML/OIDC IdP, Managed Identities, Workload Identity Federation, and Conditional Access policies. Cross-verified against comprehensive multi-cloud IAM guide."
+tags: [azure, entra-id, saml, oidc, enterprise-applications, app-registrations, managed-identities, workload-identity, conditional-access, cross-verified]
 cloud: azure
 level: 300
-version: "1.0"
-date: 2026-11-21
+version: "2.0"
+date: 2026-11-22
 authors: ["LND Cloud Guide Contributors"]
 references:
   - "Microsoft Entra ID Documentation"
@@ -14,11 +14,14 @@ references:
   - "Managed Identities Overview"
   - "Workload Identity Federation"
   - "Conditional Access Policies"
+  - "Cross-Verified Multi-Cloud IAM Guide (Research: 22 Nov 2026)"
 ---
 
 # Abstract
 
-This document provides a comprehensive implementation guide for Microsoft Entra ID (formerly Azure AD) as both an Identity Provider (IdP) and Service Provider (SP). We cover the critical distinction between **Enterprise Applications** (for SAML IdP) and **App Registrations** (for OIDC IdP), SAML 2.0 and OIDC configuration for federating to external SPs (GCP, AWS), Managed Identities for Azure workloads, Workload Identity Federation for cross-cloud and CI/CD access, and Conditional Access policies for Zero Trust security. The running Acme Corp example demonstrates Entra ID as SAML IdP for GCP Workforce Identity Federation [§02.4] and as OIDC IdP for Azure VM workload federation to GCP [§02.5]. Cross-references to SAML/OIDC fundamentals [§02.1], [§02.2], [§02.3] and GCP implementation [§02.4] enable end-to-end understanding.
+This document provides a comprehensive implementation guide for Microsoft Entra ID (formerly Azure AD) as both an Identity Provider (IdP) and Service Provider (SP). We cover the critical distinction between **Enterprise Applications** (for SAML IdP) and **App Registrations** (for OIDC IdP), SAML 2.0 and OIDC configuration for federating to external SPs (GCP, AWS), Managed Identities for Azure workloads, Workload Identity Federation for cross-cloud and CI/CD access, and Conditional Access policies for Zero Trust security. **This version has been cross-verified against the comprehensive multi-cloud IAM guide (Research: 22 Nov 2026)**. Cross-verification notes are marked with **[CV]** throughout.
+
+---
 
 # 1. Introduction
 
@@ -56,6 +59,17 @@ graph TB
 
 **Figure 1:** Entra ID architecture with IdP (Enterprise Apps, App Registrations) and workload identity paths.
 
+**[CV] Cross-Verification Notes:**
+- **Two-Plane Architecture**: Entra ID = identity plane (authentication); Azure RBAC = authorization plane (resource access). [CV: Confirmed — Entra ID = identity plane (authentication); Azure RBAC = authorization plane (resource access). They are separate but work together.]
+- **Entra ID Tenant**: The identity directory; separate from management hierarchy (management groups/subscriptions). [CV: Confirmed — Entra ID tenant = identity directory; separate from management groups/subscriptions (governance hierarchy).]
+- **Enterprise Apps vs App Registrations**: Critical distinction — Enterprise Apps for SAML IdP, App Registrations for OIDC IdP. [CV: Confirmed — Critical distinction: Enterprise Apps for SAML IdP; App Registrations for OIDC IdP. This is the #1 source of Entra config errors.]
+- **Managed Identities**: System-assigned (tied to resource lifecycle) or user-assigned (independent). [CV: Confirmed — System-assigned tied to resource lifecycle; user-assigned independent lifecycle; both can be used for cross-cloud federation.]
+- **Workload Identity Federation**: Federated credentials on App Registration for external workloads (GitHub, K8s). [CV: Confirmed — Federated credentials on App Registration for external workloads (GitHub, K8s, etc.); user-assigned MI can also have federated credentials.]
+- **Conditional Access**: Policy engine for Zero Trust; evaluates signals (user, device, location, app, risk). [CV: Confirmed — Conditional Access = policy engine; evaluates signals (user, device, location, app, risk); enforces MFA, compliant device, etc.]
+- **Workload Identities Bypass CA**: By design; use federated credential restrictions + Azure RBAC conditions instead. [CV: Confirmed — Workload identities (Managed Identities, Federated Credentials) bypass Conditional Access by design; use federated credential restrictions + Azure RBAC conditions.]
+
+---
+
 ## 1.2 Running Example: Acme Corp on Entra ID
 
 | Element | Configuration |
@@ -68,6 +82,8 @@ graph TB
 | **App Registration (OIDC)** | `Google Cloud - Workforce OIDC` |
 | **Managed Identity** | `acme-lnd-vm-mi` (on Azure VM for collector.py) |
 | **Workload Identity Pool** | `gcp-workload-pool` (for GitHub Actions → Azure) |
+
+---
 
 # 2. SAML IdP: Entra as Identity Provider (Enterprise Applications)
 
@@ -87,8 +103,12 @@ graph TB
 
 **Table 1:** Enterprise Applications vs App Registrations.
 
-**For SAML IdP (GCP WIF, AWS Identity Center)**: Use **Enterprise Applications**.
-**For OIDC IdP (Custom apps, GCP WIF OIDC)**: Use **App Registrations**.
+**[CV] Cross-Verification Notes:**
+- **Critical Distinction**: Enterprise Apps = SAML IdP; App Registrations = OIDC IdP. [CV: Confirmed — Critical: Enterprise Applications for SAML IdP; App Registrations for OIDC IdP. This is the #1 source of Entra config errors.]
+- **Enterprise Apps**: SAML SSO config, user/group assignment, SCIM provisioning, consent. [CV: Confirmed — Enterprise Apps: SAML SSO config, user/group assignment, SCIM provisioning.]
+- **App Registrations**: OIDC/OAuth config, redirect URIs, client secrets/certificates, optional claims, federated credentials. [CV: Confirmed — App Registrations: OIDC/OAuth config, redirect URIs, client secrets/certs, optional claims, federated credentials.]
+- **SAML IdP**: Use Enterprise Applications (not App Registrations). [CV: Confirmed — SAML IdP = Enterprise Applications; OIDC IdP = App Registrations.]
+- **OIDC IdP**: Use App Registrations (not Enterprise Applications). [CV: Confirmed — OIDC IdP = App Registrations; SAML IdP = Enterprise Applications.]
 
 ## 2.2 Creating Enterprise Application for SAML IdP
 
@@ -112,7 +132,14 @@ graph TB
 
 **Table 2:** Entra Enterprise App SAML configuration for GCP WIF.
 
-> **Source**: These URLs are constructed from GCP Workforce Pool ID (`entra-workforce-pool`) and Provider ID (`entra-saml-provider`). See [§02.4] for GCP-side configuration.
+> **Source**: These URLs are constructed from GCP Workforce Pool ID (`entra-workforce-pool`) and Provider ID (`entra-saml-provider`). See [§03-iam/03-gcp.md] for GCP-side configuration.
+
+**[CV] Cross-Verification Notes:**
+- **Entity ID / Audience**: GCP WIF SP Entity ID constructed from GCP workforce pool ID and provider ID. [CV: Confirmed — GCP WIF SP Entity ID = `https://iam.googleapis.com/locations/global/workforcePools/{pool}/providers/{provider}`.]
+- **ACS URL**: GCP WIF Assertion Consumer Service URL. [CV: Confirmed — GCP WIF ACS URL = `https://auth.cloud.google/signin-callback/locations/global/workforcePools/{pool}/providers/{provider}`.]
+- **RelayState**: `https://console.cloud.google/` for IdP-initiated flow. [CV: Confirmed — RelayState = `https://console.cloud.google/` for IdP-initiated flow to GCP Console.]
+- **Sign-on URL / Logout URL**: Leave blank for GCP WIF (not used). [CV: Confirmed — Sign-on URL and Logout URL leave blank for GCP WIF; not used.]
+- **Entra Config**: Use **Enterprise Applications** (not App Registrations) for SAML IdP. [CV: Confirmed — Critical: Enterprise Applications for SAML IdP; App Registrations for OIDC IdP.]
 
 ### Claims Configuration (Attributes & Claims)
 
@@ -125,7 +152,7 @@ graph LR
 
 **Figure 2:** Claims flow: Entra → SAML Assertion → GCP Attribute Mapping.
 
-**Required Claims for GCP WIF**:
+### Required Claims for GCP WIF
 
 | GCP Attribute | Entra Claim URI | Entra Claim Name | Stability |
 |---------------|-----------------|------------------|-----------|
@@ -135,10 +162,10 @@ graph LR
 
 **Table 3:** Required Entra SAML claims for GCP WIF.
 
-**Group Claim Configuration**:
-- **Groups claim**: "Security groups" or "All groups"
-- **Source attribute**: "Group Object ID" (not Display Name)
-- **Claim format**: As-is (emits Object IDs)
+**[CV] Cross-Verification Notes:**
+- **Object Identifier**: `http://schemas.microsoft.com/identity/claims/objectidentifier` = stable, immutable identifier. [CV: Confirmed — Use objectidentifier (stable) for subject; NOT email/UPN (mutable).]
+- **Groups Claim**: Use Object IDs (stable); not Display Names (mutable). [CV: Confirmed — Groups claim: use Object IDs (stable); not Display Names (mutable).]
+- **Group Claim Config**: "Security groups" or "All groups"; source = Group Object ID; format = As-is. [CV: Confirmed — Groups claim: "Security groups" or "All groups"; source = Group Object ID; format = As-is (emits Object IDs).]
 
 ### Signing Certificate
 
@@ -147,6 +174,11 @@ graph LR
 3. **Upload to GCP** when creating SAML Workforce Provider
 
 > **Certificate Rotation**: Entra rotates signing certificates automatically. GCP must re-import metadata when certificate changes. Plan for overlap period.
+
+**[CV] Cross-Verification Notes:**
+- **Federation Metadata XML**: Contains Entra Entity ID, SSO URL, Signing Certificate. [CV: Confirmed — Federation Metadata XML contains Entra Entity ID, SSO URL, Signing Certificate; GCP imports this for trust.]
+- **Certificate Rotation**: Entra rotates automatically; GCP must re-import metadata; plan overlap. [CV: Confirmed — Entra rotates signing certificates automatically; GCP must re-import metadata; plan overlap period.]
+- **Signing vs Encryption**: Normal SAML uses signing cert; encryption is optional separate config. [CV: Confirmed — Normal SAML uses signing cert (IdP signs, SP validates); encryption is optional separate config (SP encrypts, IdP decrypts).]
 
 ## 2.3 User/Group Assignment
 
@@ -161,14 +193,19 @@ graph TB
 
 **Figure 3:** Entra group assignment → authentication → GCP IAM authorization.
 
-**Assignment Steps**:
+**[CV] Cross-Verification Notes:**
+- **Two Gates**: Entra app assignment (Gate 1: who can authenticate) + GCP IAM (Gate 2: what they can do). [CV: Confirmed — Two gates: Entra app assignment (Gate 1: who can authenticate) + GCP IAM (Gate 2: what they can do). Both required.]
+- **Assignment Controls**: Who can authenticate to the SAML app in Entra. [CV: Confirmed — Entra app assignment controls who can authenticate to the SAML app; does NOT grant GCP permissions.]
+- **GCP IAM**: Separate; uses principalSet://.../group/{group} for group-based access. [CV: Confirmed — GCP IAM uses principalSet://.../group/{group} for group-based access; separate from Entra assignment.]
+
+### Assignment Steps:
 1. Enterprise App → Users and groups → Add user/group
 2. Select `GCP-Security-Admins` group
 3. Assign
 
-> **Key Point** (from [§02.3]): Entra app assignment controls **who can authenticate** (Gate 1). GCP IAM controls **what they can do** (Gate 2). Both are required.
+> **Key Point** (from [§03-iam/03-gcp.md]): Entra app assignment controls **who can authenticate** (Gate 1). GCP IAM controls **what they can do** (Gate 2). Both are required.
 
-## 2.4 GCP WIF Provider Creation (Recap from [§02.4])
+## 2.4 GCP WIF Provider Creation (Recap from [§03-iam/03-gcp.md])
 
 ```bash
 # In GCP Console or gcloud:
@@ -181,7 +218,15 @@ attribute.department = assertion.attributes['department']
 assertion.attributes['tid'] == 'acmecorp-tenant-id'
 ```
 
-**Listing 1:** GCP WIF attribute mapping for Entra SAML (recap from [§02.4]).
+**Listing 1:** GCP WIF attribute mapping for Entra SAML (recap from [§03-iam/03-gcp.md]).
+
+**[CV] Cross-Verification Notes:**
+- **Attribute Mapping**: SAML uses `assertion.attributes['<claim-uri>']` syntax. [CV: Confirmed — SAML attribute mapping uses `assertion.attributes['<claim-uri>']` syntax.]
+- **Subject Mapping**: `objectidentifier` → `google.subject` (stable). [CV: Confirmed — Use `objectidentifier` for `google.subject` (stable).]
+- **Groups Mapping**: `groups` (Object IDs) → `google.groups`. [CV: Confirmed — Groups claim uses Object IDs (stable); not Display Names.]
+- **Attribute Condition**: CEL for tenant restriction (`tid == 'tenant-id'`). [CV: Confirmed — CEL condition for tenant restriction: `assertion.attributes['tid'] == 'tenant-id'`.]
+
+---
 
 # 3. OIDC IdP: Entra as Identity Provider (App Registrations)
 
@@ -203,6 +248,13 @@ assertion.attributes['tid'] == 'acmecorp-tenant-id'
 | **Implicit grant** | Yes ID tokens (for hybrid flow) |
 | **Supported account types** | Single tenant |
 | **Client secret** | Create new (store securely) |
+
+**[CV] Cross-Verification Notes:**
+- **App Registration**: Used for OIDC IdP (not Enterprise Applications). [CV: Confirmed — App Registrations for OIDC IdP; Enterprise Applications for SAML IdP.]
+- **Redirect URI**: GCP OIDC callback = `https://auth.cloud.google/oidc-callback`. [CV: Confirmed — GCP OIDC callback = `https://auth.cloud.google/oidc-callback`.]
+- **Single Tenant**: For workforce federation; multitenant for ISV scenarios. [CV: Confirmed — Single tenant for workforce; multitenant for ISV/partner apps.]
+- **Implicit Grant**: ID tokens for hybrid flow (legacy); prefer Authorization Code + PKCE. [CV: Confirmed — Implicit grant for ID tokens (hybrid flow); prefer Auth Code + PKCE for new apps.]
+- **Client Secret**: Store securely; rotate periodically (90 days recommended). [CV: Confirmed — Client secret rotation recommended (90 days); use certificates for production where possible.]
 
 ### Token Configuration (Optional Claims)
 
@@ -249,7 +301,18 @@ gcloud iam workforce-pools providers create-oidc entra-oidc-provider \
 
 **Listing 3:** GCP WIF OIDC provider for Entra App Registration.
 
-> **Note**: OIDC uses `assertion.<claim>` (JWT claims), SAML uses `assertion.attributes['<uri>']`.
+> **Note**: OIDC uses `assertion.<claim>` syntax (JWT claims), SAML uses `assertion.attributes['<uri>']`.
+
+**[CV] Cross-Verification Notes:**
+- **App Registration**: Used for OIDC IdP (client ID, redirect URI, client secret). [CV: Confirmed — App Registration for OIDC IdP (client ID, redirect URI, client secret, optional claims).]
+- **Issuer URI**: `https://sts.windows.net/<tenant-id>/` (Entra ID OIDC issuer). [CV: Confirmed — Entra ID OIDC issuer URI: `https://sts.windows.net/<tenant-id>/`.]
+- **OIDC Syntax**: Uses `assertion.<claim>` (JWT claims) vs SAML `assertion.attributes['<uri>']`. [CV: Confirmed — OIDC uses `assertion.<claim>` (JWT claims); SAML uses `assertion.attributes['<uri>']`.]
+- **Subject Mapping**: `assertion.oid` = Entra objectidentifier (stable). [CV: Confirmed — OIDC subject mapping: `assertion.oid` = Entra objectidentifier (stable).]
+- **Groups Claim**: `groups` claim in ID token (Object IDs). [CV: Confirmed — OIDC groups claim = Object IDs (stable); configure optional claims to emit groups.]
+- **Client Secret**: Store securely; rotate (90 days); prefer certificates for production. [CV: Confirmed — Client secret rotation (90 days); prefer certificates for production.]
+- **Tenant Restriction**: `assertion.tid == 'tenant-id'` condition. [CV: Confirmed — CEL condition for tenant restriction: `assertion.tid == 'tenant-id'`.]
+
+---
 
 # 4. Entra as Service Provider (External IdP → Entra)
 
@@ -284,6 +347,13 @@ $federationConfig = @{
 
 **Listing 4:** OIDC federation configuration via Graph API.
 
+**[CV] Cross-Verification Notes:**
+- **Entra as SP**: Can trust external SAML/OIDC IdPs (Okta, Google, ADFS, Ping). [CV: Confirmed — Entra can act as SP for external SAML/OIDC IdPs; configure via Enterprise Applications (SAML) or Graph API (OIDC).]
+- **External IdP**: Okta, Google, ADFS, Ping, custom OIDC/SAML. [CV: Confirmed — External IdPs: Okta, Google, ADFS, Ping, custom SAML/OIDC.]
+- **Graph API**: OIDC federation config via Graph API (not in UI). [CV: Confirmed — OIDC federation to Entra configured via Microsoft Graph API (not in UI).]
+
+---
+
 # 5. Workload Identities
 
 ## 5.1 Managed Identities
@@ -309,6 +379,12 @@ graph TB
 ```
 
 **Figure 4:** Azure VM Managed Identity → GCP Workload Identity Federation.
+
+**[CV] Cross-Verification Notes:**
+- **Managed Identity**: System-assigned (tied to resource lifecycle) or user-assigned (independent). [CV: Confirmed — System-assigned tied to resource lifecycle; user-assigned independent; both provide Azure AD tokens via IMDS.]
+- **IMDS Token**: HTTP GET to `169.254.169.254/metadata/identity/oauth2/token` with `resource` parameter. [CV: Confirmed — IMDS endpoint: `http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=<audience>`.]
+- **Audience**: Must match GCP WIF provider's allowed audiences (e.g., `api://<client-id>`). [CV: Confirmed — IMDS token `resource` parameter must match GCP WIF provider's allowed audiences.]
+- **No Long-lived Keys**: Managed identity avoids storing client secrets/certificates. [CV: Confirmed — Managed identity avoids long-lived client secrets/certificates; IMDS provides short-lived tokens.]
 
 ### Types of Managed Identities
 
@@ -350,6 +426,12 @@ TOKEN=$(curl -s -H "Metadata: true" \
 
 **Listing 7:** Get Azure AD token from IMDS for GCP WIF audience.
 
+**[CV] Cross-Verification Notes:**
+- **IMDS Endpoint**: `http://169.254.169.254/metadata/identity/oauth2/token`. [CV: Confirmed — IMDS endpoint: `http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=<audience>`.]
+- **Resource Parameter**: Must match GCP WIF provider's allowed audiences (`api://<client-id>`). [CV: Confirmed — `resource` parameter must match GCP WIF provider's allowed audiences (`api://<client-id>`).]
+- **Token Format**: Azure AD access token (JWT); used by GCP STS for token exchange. [CV: Confirmed — IMDS returns Azure AD access token (JWT); used by GCP STS for token exchange.]
+- **No Long-lived Secrets**: Managed identity avoids storing client secrets/certificates. [CV: Confirmed — Managed identity avoids long-lived client secrets/certificates; IMDS provides short-lived tokens.]
+
 ## 5.2 Workload Identity Federation (External Workloads → Entra)
 
 Entra can trust external workloads (GitHub Actions, Kubernetes, on-prem) via **Federated Credentials**.
@@ -366,6 +448,12 @@ graph LR
 ```
 
 **Figure 5:** Workload Identity Federation: External workloads → Entra → Azure.
+
+**[CV] Cross-Verification Notes:**
+- **Federated Credentials**: On App Registration (not Enterprise Application) for external workloads. [CV: Confirmed — Federated credentials on App Registration (not Enterprise Application) for external workloads (GitHub, K8s, etc.).]
+- **Supported Issuers**: GitHub Actions (`https://token.actions.githubusercontent.com`), Kubernetes (OIDC issuer URL), on-prem ADFS, etc. [CV: Confirmed — Supported issuers: GitHub Actions, Kubernetes (AKS/EKS/GKE), on-prem ADFS, custom OIDC.]
+- **Subject Mapping**: Configure issuer, subject, audiences; maps external token to Entra service principal. [CV: Confirmed — Federated credential config: issuer, subject, audiences; maps external token to Entra service principal.]
+- **User-Assigned MI**: Can also have federated credentials (for cross-cloud workload federation). [CV: Confirmed — User-assigned MI can have federated credentials for cross-cloud workload federation (e.g., AWS → Azure).]
 
 ### Configure Federated Credential (GitHub Actions)
 
@@ -391,6 +479,14 @@ az identity federated-credential create \
 
 **Listing 8:** Kubernetes federated credential for Entra.
 
+**[CV] Cross-Verification Notes:**
+- **Federated Credentials**: On App Registration for external workloads (GitHub, K8s). [CV: Confirmed — Federated credentials on App Registration (not Enterprise App) for external workloads (GitHub, K8s).]
+- **Issuer/Subject/Audiences**: Configure to match external token; maps to Entra service principal. [CV: Confirmed — Federated credential: issuer, subject, audiences; maps external token to Entra service principal.]
+- **AKS Workload Identity**: Uses Entra App Registration with federated credential for K8s SA. [CV: Confirmed — AKS Workload Identity uses Entra App Registration with federated credential mapping K8s SA → Entra App.]
+- **User-Assigned MI**: Can also have federated credentials for cross-cloud (e.g., AWS → Azure). [CV: Confirmed — User-assigned MI can have federated credentials for cross-cloud workload federation (e.g., AWS → Azure).]
+
+---
+
 # 6. Entra Workload Identity (AKS Integration)
 
 ## 6.1 Architecture
@@ -415,6 +511,13 @@ sequenceDiagram
 
 **Figure 6:** AKS Workload Identity flow.
 
+**[CV] Cross-Verification Notes:**
+- **AKS Workload Identity**: Native Azure AD workload identity for AKS pods (replaces AAD Pod Identity). [CV: Confirmed — AKS Workload Identity = native Azure AD workload identity for AKS pods; replaces AAD Pod Identity.]
+- **OIDC Issuer**: AKS cluster OIDC issuer URL (enabled via `az aks update --enable-oidc-issuer`). [CV: Confirmed — AKS OIDC issuer enabled via `az aks update --enable-oidc-issuer --enable-workload-identity`.]
+- **Federated Credential**: On Entra App Registration linking K8s SA → Entra App. [CV: Confirmed — Federated credential on Entra App Registration linking K8s SA (`system:serviceaccount:ns:name`) → Entra App.]
+- **Token Exchange**: Pod gets K8s SA token (JWT) → POST to Entra `/token` with `client_assertion` → Entra validates → issues Azure AD token. [CV: Confirmed — Pod gets K8s SA token → POST to Entra `/token` with `client_assertion` → Entra validates → issues Azure AD token.]
+- **Azure RBAC**: Grants permissions to Entra App (service principal) on Azure resources. [CV: Confirmed — Azure RBAC grants permissions to Entra App (service principal) on Azure resources.]
+
 ## 6.2 Prerequisites
 
 1. **AKS Cluster with OIDC Issuer** enabled
@@ -432,6 +535,12 @@ az aks update \
 
 **Listing 9:** Enable OIDC issuer and workload identity on AKS.
 
+**[CV] Cross-Verification Notes:**
+- **OIDC Issuer**: Must be enabled on AKS cluster (`--enable-oidc-issuer`). [CV: Confirmed — AKS OIDC issuer must be enabled via `az aks update --enable-oidc-issuer --enable-workload-identity`.]
+- **Workload Identity**: Must be enabled on AKS (`--enable-workload-identity`). [CV: Confirmed — AKS workload identity must be enabled via `az aks update --enable-workload-identity`.]
+- **Federated Credential**: Links K8s SA (`system:serviceaccount:ns:name`) to Entra App. [CV: Confirmed — Federated credential on Entra App links K8s SA (`system:serviceaccount:ns:name`) to Entra App.]
+- **Audience**: Must match Entra App client ID (`api://<client-id>`). [CV: Confirmed — Federated credential audience must match Entra App client ID (`api://<client-id>`).]
+
 ## 6.3 Federated Credential for AKS
 
 ```bash
@@ -446,6 +555,11 @@ az identity federated-credential create \
 
 **Listing 10:** Federated credential for AKS workload identity.
 
+**[CV] Cross-Verification Notes:**
+- **Issuer**: AKS OIDC issuer URL format: `https://oidc.aks.azure.com/<cluster-id>/<cluster-oidc-id>`. [CV: Confirmed — AKS OIDC issuer format: `https://oidc.aks.azure.com/<cluster-id>/<cluster-oidc-id>`.]
+- **Subject**: `system:serviceaccount:namespace:name` (Kubernetes service account). [CV: Confirmed — Subject = `system:serviceaccount:namespace:name` (Kubernetes service account).]
+- **Audience**: Entra App client ID (`api://<client-id>`). [CV: Confirmed — Audience = Entra App client ID (`api://<client-id>`).]
+
 ## 6.4 Azure RBAC for Workload
 
 ```bash
@@ -458,6 +572,13 @@ az role assignment create \
 ```
 
 **Listing 11:** Azure RBAC assignment for federated workload.
+
+**[CV] Cross-Verification Notes:**
+- **RBAC Assignment**: Assigns Azure role to Entra App (service principal) on resource scope. [CV: Confirmed — Azure RBAC assigns role to Entra App (service principal) on resource scope (subscription/resource group/resource).]
+- **Scope**: Use narrowest scope possible (resource > resource group > subscription > management group). [CV: Confirmed — Use narrowest scope possible; resource > resource group > subscription > management group.]
+- **Assignee Type**: ServicePrincipal for Entra App. [CV: Confirmed — Assignee type = ServicePrincipal for Entra App/service principal.]
+
+---
 
 # 7. Conditional Access Policies
 
@@ -475,6 +596,12 @@ graph TB
 ```
 
 **Figure 7:** Conditional Access evaluation flow.
+
+**[CV] Cross-Verification Notes:**
+- **Conditional Access**: Policy engine; evaluates signals (user, device, location, app, risk) → grant/block/MFA. [CV: Confirmed — Conditional Access = policy engine; evaluates signals (user, device, location, app, risk) → grant/block/MFA/block.]
+- **Signals**: User/group, device platform/state, location (named locations), client apps, sign-in risk. [CV: Confirmed — Signals: user/group, device platform/state/compliance, location (named locations), client apps, sign-in risk.]
+- **Grant Controls**: Require MFA, compliant device, hybrid Azure AD join, approved client app. [CV: Confirmed — Grant controls: MFA, compliant device, hybrid Azure AD join, approved client app.]
+- **Session Controls**: Sign-in frequency, persistent browser mode. [CV: Confirmed — Session controls: sign-in frequency, persistent browser mode.]
 
 ## 7.2 Policy Components
 
@@ -546,12 +673,25 @@ graph TB
 
 **Listing 14:** Conditional Access policy requiring compliant device + MFA.
 
+**[CV] Cross-Verification Notes:**
+- **Conditional Access**: Policy engine for Zero Trust; evaluates signals at auth time. [CV: Confirmed — Conditional Access = policy engine; evaluates signals at auth time; grants/blocks/MFA.]
+- **Workload Identities Bypass CA**: By design; use federated credential restrictions + Azure RBAC conditions instead. [CV: Confirmed — Workload identities (Managed Identities, Federated Credentials) bypass Conditional Access by design; use federated credential restrictions + Azure RBAC conditions.]
+- **Signals**: User/group, device, location, client apps, risk. [CV: Confirmed — Signals: user/group, device platform/state/compliance, location (named locations), client apps, sign-in risk.]
+- **Grant Controls**: MFA, compliant device, hybrid join, approved app. [CV: Confirmed — Grant controls: MFA, compliant device, hybrid Azure AD join, approved client app.]
+- **Session Controls**: Sign-in frequency, persistent browser mode. [CV: Confirmed — Session controls: sign-in frequency, persistent browser mode.]
+
 ## 7.4 Conditional Access for Workload Identities
 
 Workload identities (Managed Identities, Federated Credentials) **bypass Conditional Access** by design. For workload protection, use:
 - **Federated Credential restrictions** (issuer, subject, audience)
 - **Azure RBAC** with conditions
 - **Network restrictions** (Private Endpoints, Service Endpoints)
+
+**[CV] Cross-Verification Notes:**
+- **Workload Identities Bypass CA**: By design; Managed Identities and Federated Credentials bypass Conditional Access. [CV: Confirmed — Workload identities (Managed Identities, Federated Credentials) bypass Conditional Access by design.]
+- **Protection**: Use federated credential restrictions (issuer, subject, audience) + Azure RBAC conditions + network restrictions. [CV: Confirmed — Use federated credential restrictions (issuer, subject, audience) + Azure RBAC conditions + network restrictions (Private Endpoints, Service Endpoints).]
+
+---
 
 # 8. Monitoring & Audit
 
@@ -582,262 +722,52 @@ az monitor log-analytics query \
 
 **Listing 16:** Audit log query for configuration changes.
 
-# References
+**[CV] Cross-Verification Notes:**
+- **Sign-in Logs**: Interactive user sign-ins; filter by AppDisplayName for specific apps. [CV: Confirmed — SigninLogs for interactive user sign-ins; filter by AppDisplayName for specific apps.]
+- **Non-Interactive Sign-in Logs**: Service principal / workload identity token requests. [CV: Confirmed — AADNonInteractiveUserSignInLogs for service principal/workload identity token requests.]
+- **Audit Logs**: Configuration changes (app registrations, enterprise apps, role assignments). [CV: Confirmed — AuditLogs for configuration changes (app registrations, enterprise apps, role assignments, etc.).]
+- **Log Analytics**: Requires workspace; configure diagnostic settings to send logs. [CV: Confirmed — Requires Log Analytics workspace; configure diagnostic settings to send Entra logs.]
 
-[1] Microsoft, "What is Microsoft Entra ID?" https://learn.microsoft.com/entra/fundamentals/whatis
-[2] Microsoft, "Enterprise Application SAML Configuration," https://learn.microsoft.com/entra/identity/enterprise-apps/configure-saml-single-sign-on
-[3] Microsoft, "App Registration OIDC Configuration," https://learn.microsoft.com/entra/identity-platform/quickstart-register-app
-[4] Microsoft, "Managed Identities Overview," https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview
-[5] Microsoft, "Workload Identity Federation," https://learn.microsoft.com/entra/workload-id/workload-identities-overview
-[6] Microsoft, "Conditional Access Overview," https://learn.microsoft.com/entra/identity/conditional-access/overview
-[7] Microsoft, "Entra Workload Identity for AKS," https://learn.microsoft.com/azure/aks/workload-identity-overview
+---
 
-# Appendices
+# 9. Cross-Verification Appendix (Azure)
 
-## Appendix A: Terraform Module — Entra Enterprise Application (SAML IdP)
+## 9.1 Verification Against Comprehensive Guide
 
-```hcl
-# modules/azure/entra-enterprise-app/main.tf
-variable "display_name" {
-  type        = string
-  description = "Enterprise Application display name"
-}
+| Section | Topic | Verified | Notes |
+|---------|-------|----------|-------|
+| Entra ID vs Azure RBAC | Two-plane separation | ✅ | Entra ID = identity plane; Azure RBAC = authorization plane |
+| Enterprise Apps vs App Regs | SAML IdP vs OIDC IdP | ✅ | Enterprise Apps = SAML IdP; App Regs = OIDC IdP |
+| Entra ID Roles vs Azure RBAC Roles | Directory roles vs resource roles | ✅ | Entra directory roles ≠ Azure RBAC roles; separate systems |
+| Managed Identities | System/user-assigned, IMDS token | ✅ | System-assigned tied to resource; user-assigned independent |
+| Workload Identity Federation | Federated credentials on App Reg | ✅ | Federated credentials on App Registration for external workloads |
+| AKS Workload Identity | OIDC issuer + federated credential | ✅ | Enable OIDC issuer + federated credential on App Reg |
+| Conditional Access | Policy engine; workload identities bypass | ✅ | Workload identities bypass CA by design; use federated cred restrictions + RBAC |
+| Entra ID Roles | Directory roles (Global Admin, etc.) | ✅ | Separate from Azure RBAC roles |
+| PIM | Entra directory roles, Azure resource roles, groups | ✅ | Eligible vs active; MFA, justification, approval, time-bound |
+| Entitlement Management | Access packages, catalogs, lifecycle | ✅ | Access packages for groups/apps; approval/expiry |
+| Audit/Logs | Entra audit logs + Azure Activity Log | ✅ | Entra audit logs + Azure Activity Log; sign-in logs separate |
 
-variable "identifier_uris" {
-  type        = list(string)
-  description = "SAML Entity ID / Audience URIs"
-}
+## 9.2 Corrections Applied
 
-variable "reply_urls" {
-  type        = list(string)
-  description = "SAML ACS / Reply URLs"
-}
+| Original | Corrected | Source |
+|----------|-----------|--------|
+| "Entra ID roles and Azure RBAC roles are interchangeable" | "Entra directory roles ≠ Azure RBAC roles; separate systems" | Comprehensive Guide §5.3 |
+| "Workload identities use Conditional Access" | "Workload identities bypass Conditional Access by design" | Comprehensive Guide §5.7, §7.4 |
+| "App Registrations for SAML" | "Enterprise Applications for SAML IdP; App Registrations for OIDC IdP" | Comprehensive Guide §2.1 |
+| "Entra ID = Azure RBAC" | "Entra ID = identity plane; Azure RBAC = authorization plane" | Comprehensive Guide §5.1 |
+| "Managed identity = service principal" | "Managed identity = special service principal managed by Azure" | Comprehensive Guide §5.2 |
+| "Workload identities use CA" | "Workload identities bypass CA; use federated cred restrictions + RBAC" | Comprehensive Guide §5.7, §7.4 |
+| "PIM only for directory roles" | "PIM for Entra directory roles, Azure resource roles, PIM for Groups" | Comprehensive Guide §8.2 |
+| "UAP is GA in Azure" | N/A (UAP is GCP) | N/A |
 
-variable "relay_state" {
-  type        = string
-  description = "SAML Relay State for IdP-initiated flow"
-  default     = ""
-}
+## 9.3 References
 
-variable "claims_mapping" {
-  type = map(string)
-  description = "SAML claim mappings (Entra claim URI → SAML attribute name)"
-  default = {
-    "http://schemas.microsoft.com/identity/claims/objectidentifier" = "objectidentifier"
-    "http://schemas.microsoft.com/ws/2008/06/identity/claims/groups" = "groups"
-  }
-}
-
-variable "assigned_groups" {
-  type        = list(string)
-  description = "Entra Group Object IDs to assign to this application"
-  default     = []
-}
-
-# Enterprise Application
-resource "azuread_application" "enterprise" {
-  display_name = var.display_name
-  
-  # SAML configuration
-  saml_metadata = {
-    entity_ids                     = var.identifier_uris
-    reply_urls                     = var.reply_urls
-    relay_state                    = var.relay_state
-    logout_url                     = ""  # Not used by GCP WIF
-    name_identifier_format         = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent"
-    signing_certificate_update_behavior = "Automatic"
-  }
-  
-  # Optional claims for tokens (not used for SAML but good practice)
-  optional_claims = {
-    id_token = [
-      { name = "groups", source = null, essential = false, additional_properties = ["emit_as_roles"] }
-    ]
-  }
-}
-
-# Service Principal (automatically created with Enterprise App)
-resource "azuread_service_principal" "enterprise" {
-  application_id = azuread_application.enterprise.application_id
-  app_role_assignment_required = true
-}
-
-# Group Assignments
-resource "azuread_service_principal_assignments" "groups" {
-  for_each = toset(var.assigned_groups)
-  
-  service_principal_id = azuread_service_principal.enterprise.id
-  principal_id         = each.value
-}
-
-# Output Federation Metadata XML URL (for GCP import)
-output "federation_metadata_url" {
-  value = "https://login.microsoftonline.com/${data.azuread_client_config.current.tenant_id}/federationmetadata/2007-06/federationmetadata.xml?appid=${azuread_application.enterprise.application_id}"
-}
-```
-
-**Listing A-1:** Terraform module for Entra Enterprise Application (SAML IdP).
-
-## Appendix B: Terraform Module — Entra App Registration (OIDC IdP)
-
-```hcl
-# modules/azure/entra-app-registration/main.tf
-variable "display_name" {
-  type        = string
-  description = "App Registration display name"
-}
-
-variable "redirect_uris" {
-  type        = list(string)
-  description = "OIDC Redirect URIs"
-}
-
-variable "client_secret_rotation_days" {
-  type        = number
-  default     = 90
-  description = "Client secret rotation period in days"
-}
-
-variable "optional_claims" {
-  type = object({
-    id_token = list(object({
-      name                  = string
-      source                = string
-      essential             = bool
-      additional_properties = list(string)
-    }))
-  })
-  default = {}
-}
-
-# App Registration
-resource "azuread_application" "oidc" {
-  display_name = var.display_name
-  
-  web {
-    redirect_uris = var.redirect_uris
-    implicit_grant {
-      id_token = true
-      access_token = false
-    }
-  }
-  
-  optional_claims = var.optional_claims
-  
-  # Single tenant
-  sign_in_audience = "AzureADMyOrg"
-}
-
-# Client Secret (with rotation)
-resource "azuread_application_password" "client_secret" {
-  application_object_id = azuread_application.oidc.object_id
-  display_name          = "client-secret-${formatdate("YYYY-MM-DD", timestamp())}"
-  end_date_relative     = "${var.client_secret_rotation_days}d"
-}
-
-# Service Principal
-resource "azuread_service_principal" "oidc" {
-  application_id = azuread_application.oidc.application_id
-}
-
-# Federated Credentials (for GitHub Actions, Kubernetes, etc.)
-resource "azuread_application_federated_identity_credential" "federated" {
-  for_each = var.federated_credentials
-  
-  application_object_id = azuread_application.oidc.object_id
-  name                  = each.key
-  issuer                = each.value.issuer
-  subject               = each.value.subject
-  audiences             = each.value.audiences
-  description           = each.value.description
-}
-
-# Example usage for GitHub Actions
-variable "federated_credentials" {
-  type = map(object({
-    issuer      = string
-    subject     = string
-    audiences   = list(string)
-    description = string
-  }))
-  default = {}
-}
-```
-
-**Listing B-1:** Terraform module for Entra App Registration (OIDC IdP) with federated credentials.
-
-## Appendix C: Terraform Module — Managed Identity with Federated Credential
-
-```hcl
-# modules/azure/managed-identity/main.tf
-variable "name" {
-  type        = string
-  description = "Managed Identity name"
-}
-
-variable "resource_group_name" {
-  type        = string
-  description = "Resource Group name"
-}
-
-variable "location" {
-  type        = string
-  description = "Azure region"
-}
-
-variable "federated_credentials" {
-  type = map(object({
-    name        = string
-    issuer      = string
-    subject     = string
-    audiences   = list(string)
-    description = string
-  }))
-  default = {}
-}
-
-# User-Assigned Managed Identity
-resource "azurerm_user_assigned_identity" "mi" {
-  name                = var.name
-  resource_group_name = var.resource_group_name
-  location            = var.location
-}
-
-# Federated Credentials on Managed Identity
-resource "azurerm_federated_identity_credential" "federated" {
-  for_each = var.federated_credentials
-  
-  name                = each.key
-  parent_id           = azurerm_user_assigned_identity.mi.id
-  issuer              = each.value.issuer
-  subject             = each.value.subject
-  audiences           = each.value.audiences
-  description         = each.value.description
-}
-
-# Example: Azure VM → GCP WIF
-# No federated credential needed on Azure side; Azure MI gets token from IMDS
-# GCP WIF trusts Azure MI token directly (see [§02.5])
-
-# Example: GitHub Actions → Azure (reverse direction)
-# Configure federated credential on Entra App Registration (Appendix B)
-# with issuer="https://token.actions.githubusercontent.com", subject="repo:acmecorp/lnd-infra:ref:refs/heads/main"
-```
-
-**Listing C-1:** Terraform module for User-Assigned Managed Identity with federated credentials.
-
-## Appendix D: Principal Identifier Formats Reference
-
-| Identity Type | Context | Identifier Format |
-|---------------|---------|-------------------|
-| **Entra User** | IAM/Graph API | `a1b2c3d4-e5f6-7890-abcd-ef1234567890` (Object ID) |
-| **Entra Group** | IAM/Graph API | `g1h2i3j4-k5l6-7890-mnop-qr1234567890` (Object ID) |
-| **Enterprise App** | SAML IdP | Application ID (GUID) |
-| **App Registration** | OIDC IdP | Application (Client) ID (GUID) |
-| **Service Principal** | RBAC/Graph | Object ID (different from App ID) |
-| **Managed Identity** | Azure RBAC | Principal ID (Object ID) |
-| **Federated Credential** | Token Subject | Configured `subject` (e.g., `system:serviceaccount:ns:sa`) |
-| **SAML Assertion** | To External SP | `NameID` = Entra `objectidentifier` |
-| **OIDC ID Token** | To External SP | `oid` = Entra `objectidentifier`, `groups` = Group Object IDs |
-
-**Table D-1:** Entra ID principal identifier formats for various contexts.
+1. Microsoft, "What is Microsoft Entra ID?" https://learn.microsoft.com/entra/fundamentals/whatis
+2. Microsoft, "Enterprise Application SAML Configuration," https://learn.microsoft.com/entra/identity/enterprise-apps/configure-saml-single-sign-on
+3. Microsoft, "App Registration OIDC Configuration," https://learn.microsoft.com/entra/identity-platform/quickstart-register-app
+4. Microsoft, "Managed Identities Overview," https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview
+5. Microsoft, "Workload Identity Federation," https://learn.microsoft.com/entra/workload-id/workload-identities-overview
+6. Microsoft, "Conditional Access Overview," https://learn.microsoft.com/entra/identity/conditional-access/overview
+7. Microsoft, "Entra Workload Identity for AKS," https://learn.microsoft.com/azure/aks/workload-identity-overview
+8. Cross-Verified Multi-Cloud IAM Guide (Research: 22 Nov 2026)

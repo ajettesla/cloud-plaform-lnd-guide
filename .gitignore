@@ -3,6 +3,7 @@ tmp/
 *.tmp
 *.temp
 
+opencode.sh
 # OS
 .DS_Store
 Thumbs.db
